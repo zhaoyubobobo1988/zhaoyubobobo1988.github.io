@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
+  <circle cx="90" cy="90" r="85" stroke="#00d4b4" stroke-width="2" opacity="0.4"/>
+  <circle cx="90" cy="90" r="60" stroke="#00d4b4" stroke-width="1.5" opacity="0.25"/>
+  <!-- UAV silhouette -->
+  <g fill="#00d4b4" opacity="0.9">
+    <!-- center body -->
+    <rect x="78" y="84" width="24" height="12" rx="4"/>
+    <!-- left arm -->
+    <rect x="40" y="86" width="38" height="4" rx="2"/>
+    <!-- right arm -->
+    <rect x="102" y="86" width="38" height="4" rx="2"/>
+    <!-- front arm -->
+    <rect x="86" y="48" width="8" height="36" rx="2"/>
+    <!-- back arm -->
+    <rect x="86" y="96" width="8" height="36" rx="2"/>
+    <!-- rotors -->
+    <ellipse cx="40" cy="82" rx="14" ry="4" opacity="0.7"/>
+    <ellipse cx="140" cy="82" rx="14" ry="4" opacity="0.7"/>
+    <ellipse cx="90" cy="44" rx="14" ry="4" opacity="0.7"/>
+    <ellipse cx="90" cy="136" rx="14" ry="4" opacity="0.7"/>
+  </g>
+  <!-- center dot -->
+  <circle cx="90" cy="90" r="5" fill="#00d4b4"/>
+</svg>
