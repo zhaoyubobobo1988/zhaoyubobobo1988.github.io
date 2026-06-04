@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import TechBackground from '@/components/TechBackground.vue'
-
 
 const activeSection = ref('about')
 
@@ -15,22 +13,22 @@ const sections = [
 const skills = [
   {
     category: 'Backend',
-    color: '#00d4b4',
+    color: '#d4622d',
     items: ['Python', 'FastAPI', 'RabbitMQ', 'Redis', 'PostgreSQL', 'MySQL', 'MinIO'],
   },
   {
     category: 'DevOps',
-    color: '#38bdf8',
+    color: '#2563eb',
     items: ['Docker', 'Docker Compose', 'Linux', 'Nginx'],
   },
   {
     category: 'AI / LLM',
-    color: '#a78bfa',
+    color: '#7c3aed',
     items: ['MCP', 'RAG', 'Prompt Engineering', 'Context Engineering', 'LLM 应用'],
   },
   {
     category: 'Hydrology & ML',
-    color: '#34d399',
+    color: '#059669',
     items: ['Torchhydro', 'LSTM', '时序预测', '洪水预报模型'],
   },
 ]
@@ -65,13 +63,13 @@ const education = [
     school: '大连理工大学',
     degree: '计算机技术 · 硕士在读',
     period: '2024.09 — 2027.07（预计）',
-    color: '#00d4b4',
+    color: '#d4622d',
   },
   {
     school: '西安工业大学',
     degree: '软件工程 · 学士',
     period: '2019.09 — 2023.07',
-    color: '#38bdf8',
+    color: '#2563eb',
   },
 ]
 
@@ -99,7 +97,6 @@ function scrollTo(id: string) {
 
 <template>
   <div class="portfolio">
-    <TechBackground effect="connections" :density="28" :opacity="0.28" :full-screen="true" />
 
     <div class="layout">
 
@@ -253,15 +250,13 @@ function scrollTo(id: string) {
 <style scoped>
 /* ── Base ── */
 .portfolio {
-  position: relative;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
+  background: #f7f6f2;
 }
 
 .layout {
-  position: relative;
-  z-index: 10;
   display: flex;
   width: 100%;
   height: 100%;
@@ -275,9 +270,8 @@ function scrollTo(id: string) {
   display: flex;
   flex-direction: column;
   padding: 52px 32px 36px;
-  border-right: 1px solid rgba(0, 212, 180, 0.08);
-  background: rgba(5, 13, 26, 0.88);
-  backdrop-filter: blur(16px);
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
+  background: #efece4;
 }
 
 .sb-top { margin-bottom: 44px; }
@@ -286,35 +280,34 @@ function scrollTo(id: string) {
   width: 68px;
   height: 68px;
   border-radius: 12px;
-  background: linear-gradient(135deg, #00d4b4 0%, #0891b2 100%);
+  background: linear-gradient(135deg, #d4622d 0%, #b84a1e 100%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 28px;
   font-weight: 700;
-  color: #050d1a;
+  color: #fff;
   margin-bottom: 18px;
-  box-shadow: 0 0 28px rgba(0, 212, 180, 0.22);
 }
 
 .name {
   font-size: 20px;
   font-weight: 700;
-  color: #ccd6f6;
+  color: #1c1a18;
   letter-spacing: 3px;
   margin-bottom: 6px;
 }
 
 .role {
   font-size: 12px;
-  color: #00d4b4;
+  color: #d4622d;
   letter-spacing: 1px;
   margin-bottom: 3px;
 }
 
 .school {
   font-size: 11px;
-  color: #8892b0;
+  color: #8a8070;
   letter-spacing: 0.5px;
 }
 
@@ -334,15 +327,15 @@ function scrollTo(id: string) {
   background: none;
   border: none;
   cursor: pointer;
-  color: #8892b0;
+  color: #8a8070;
   font-size: 12px;
   letter-spacing: 1.5px;
   text-align: left;
   transition: color 0.2s;
 }
 
-.nav-item:hover { color: #ccd6f6; }
-.nav-item.active { color: #00d4b4; }
+.nav-item:hover { color: #1c1a18; }
+.nav-item.active { color: #d4622d; }
 
 .nav-num {
   font-family: 'JetBrains Mono', 'Consolas', monospace;
@@ -369,7 +362,7 @@ function scrollTo(id: string) {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  border-top: 1px solid rgba(255,255,255,0.05);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
   padding-top: 20px;
 }
 
@@ -378,27 +371,12 @@ function scrollTo(id: string) {
   align-items: center;
   gap: 8px;
   font-size: 11px;
-  color: #8892b0;
+  color: #8a8070;
   text-decoration: none;
   transition: color 0.2s;
   letter-spacing: 0.3px;
 }
-.cl:hover { color: #00d4b4; }
-
-.back-btn {
-  margin-top: 6px;
-  padding: 7px 0;
-  background: none;
-  border: none;
-  border-top: 1px solid rgba(255,255,255,0.05);
-  color: #8892b0;
-  font-size: 10px;
-  letter-spacing: 3px;
-  cursor: pointer;
-  transition: color 0.2s;
-  text-align: left;
-}
-.back-btn:hover { color: #ccd6f6; }
+.cl:hover { color: #d4622d; }
 
 /* ── Content ── */
 .content {
@@ -407,7 +385,7 @@ function scrollTo(id: string) {
   overflow-y: auto;
   padding: 80px 72px 120px;
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 212, 180, 0.15) transparent;
+  scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
 }
 
 /* ── Section ── */
@@ -425,14 +403,14 @@ function scrollTo(id: string) {
 
 .sec-num {
   font-family: 'JetBrains Mono', 'Consolas', monospace;
-  color: #00d4b4;
+  color: #d4622d;
   font-size: 13px;
 }
 
 .sec-title {
   font-size: 18px;
   font-weight: 600;
-  color: #ccd6f6;
+  color: #1c1a18;
   letter-spacing: 3px;
   white-space: nowrap;
 }
@@ -440,7 +418,7 @@ function scrollTo(id: string) {
 .sec-rule {
   flex: 1;
   height: 1px;
-  background: rgba(0, 212, 180, 0.1);
+  background: rgba(0, 0, 0, 0.1);
   max-width: 200px;
 }
 
@@ -448,7 +426,7 @@ function scrollTo(id: string) {
 .bio {
   font-size: 14px;
   line-height: 1.95;
-  color: #8892b0;
+  color: #5c5649;
   max-width: 560px;
   margin-bottom: 16px;
 }
@@ -459,7 +437,7 @@ function scrollTo(id: string) {
   gap: 44px;
   margin-top: 36px;
   padding-top: 28px;
-  border-top: 1px solid rgba(255,255,255,0.05);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .stat { display: flex; flex-direction: column; gap: 5px; }
@@ -468,13 +446,13 @@ function scrollTo(id: string) {
   font-family: 'JetBrains Mono', 'Consolas', monospace;
   font-size: 40px;
   font-weight: 700;
-  color: #00d4b4;
+  color: #d4622d;
   line-height: 1;
 }
 
 .stat-lbl {
   font-size: 11px;
-  color: #8892b0;
+  color: #8a8070;
   letter-spacing: 1.5px;
 }
 
@@ -501,20 +479,19 @@ function scrollTo(id: string) {
 
 .stag {
   padding: 4px 12px;
-  border-radius: 3px;
+  border-radius: 4px;
   font-family: 'JetBrains Mono', 'Consolas', monospace;
   font-size: 12px;
-  border: 1px solid var(--c, #00d4b4);
-  color: var(--c, #00d4b4);
-  opacity: 0.65;
+  border: 1px solid color-mix(in srgb, var(--c, #d4622d) 35%, transparent);
+  color: var(--c, #d4622d);
+  background: color-mix(in srgb, var(--c, #d4622d) 6%, transparent);
   transition: all 0.2s ease;
   cursor: default;
 }
 
 .stag:hover {
-  opacity: 1;
-  background: color-mix(in srgb, var(--c, #00d4b4) 7%, transparent);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--c, #00d4b4) 18%, transparent);
+  background: color-mix(in srgb, var(--c, #d4622d) 14%, transparent);
+  border-color: color-mix(in srgb, var(--c, #d4622d) 60%, transparent);
 }
 
 /* ── Terminal cards ── */
@@ -525,13 +502,15 @@ function scrollTo(id: string) {
 }
 
 .tcard {
-  border: 1px solid rgba(0, 212, 180, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   overflow: hidden;
-  transition: border-color 0.25s, transform 0.25s;
+  background: #fff;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
 }
 .tcard:hover {
-  border-color: rgba(0, 212, 180, 0.32);
+  border-color: rgba(212, 98, 45, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
   transform: translateY(-2px);
 }
 
@@ -540,27 +519,27 @@ function scrollTo(id: string) {
   align-items: center;
   gap: 10px;
   padding: 10px 16px;
-  background: rgba(0, 212, 180, 0.03);
-  border-bottom: 1px solid rgba(0, 212, 180, 0.08);
+  background: #f7f5f0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
 }
 
 .dots { display: flex; gap: 5px; }
 .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
-.dr { background: #ef4444; opacity: 0.8; }
-.dy { background: #f59e0b; opacity: 0.8; }
-.dg { background: #22c55e; opacity: 0.8; }
+.dr { background: #ef4444; }
+.dy { background: #f59e0b; }
+.dg { background: #22c55e; }
 
 .tfn {
   font-family: 'JetBrains Mono', 'Consolas', monospace;
   font-size: 12px;
-  color: #8892b0;
+  color: #8a8070;
   flex: 1;
 }
 
 .tperiod {
   font-family: 'JetBrains Mono', 'Consolas', monospace;
   font-size: 11px;
-  color: rgba(0, 212, 180, 0.45);
+  color: rgba(212, 98, 45, 0.55);
 }
 
 .tcard-bd { padding: 22px 24px; }
@@ -568,13 +547,13 @@ function scrollTo(id: string) {
 .ptitle {
   font-size: 15px;
   font-weight: 600;
-  color: #ccd6f6;
+  color: #1c1a18;
   margin-bottom: 10px;
 }
 
 .pdesc {
   font-size: 13px;
-  color: #8892b0;
+  color: #5c5649;
   line-height: 1.8;
   margin-bottom: 18px;
 }
@@ -587,21 +566,22 @@ function scrollTo(id: string) {
   font-family: 'JetBrains Mono', 'Consolas', monospace;
   font-size: 28px;
   font-weight: 700;
-  color: #00d4b4;
+  color: #d4622d;
   line-height: 1;
 }
 
-.pml { font-size: 11px; color: #8892b0; letter-spacing: 0.5px; }
+.pml { font-size: 11px; color: #8a8070; letter-spacing: 0.5px; }
 
 .ptags { display: flex; flex-wrap: wrap; gap: 6px; }
 
 .ptag {
   font-family: 'JetBrains Mono', 'Consolas', monospace;
   padding: 2px 10px;
-  border-radius: 3px;
+  border-radius: 4px;
   font-size: 11px;
-  border: 1px solid rgba(0, 212, 180, 0.18);
-  color: rgba(0, 212, 180, 0.6);
+  border: 1px solid rgba(212, 98, 45, 0.2);
+  color: #d4622d;
+  background: rgba(212, 98, 45, 0.05);
 }
 
 /* ── Education ── */
@@ -616,7 +596,7 @@ function scrollTo(id: string) {
   display: flex;
   gap: 20px;
   padding: 0 0 36px 28px;
-  border-left: 1.5px solid var(--ec, #00d4b4);
+  border-left: 1.5px solid var(--ec, #d4622d);
 }
 .edu:last-child { border-left-color: transparent; padding-bottom: 0; }
 
@@ -627,8 +607,8 @@ function scrollTo(id: string) {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--ec, #00d4b4);
-  box-shadow: 0 0 10px var(--ec, #00d4b4);
+  background: var(--ec, #d4622d);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--ec, #d4622d) 40%, transparent);
   flex-shrink: 0;
 }
 
@@ -637,20 +617,20 @@ function scrollTo(id: string) {
 .edu-school {
   font-size: 16px;
   font-weight: 600;
-  color: #ccd6f6;
+  color: #1c1a18;
   margin-bottom: 5px;
 }
 
 .edu-degree {
   font-size: 13px;
-  color: #8892b0;
+  color: #5c5649;
   margin-bottom: 6px;
 }
 
 .edu-period {
   font-family: 'JetBrains Mono', 'Consolas', monospace;
   font-size: 11px;
-  color: var(--ec, #00d4b4);
-  opacity: 0.65;
+  color: var(--ec, #d4622d);
+  opacity: 0.7;
 }
 </style>
