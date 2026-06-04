@@ -39,6 +39,8 @@ let velY = 0
 let velX = 0
 const AUTO_ROT = 0.0005
 
+let zoom = 1.0
+
 let isDragging = false
 let didDrag = false
 let dragX = 0
@@ -186,10 +188,10 @@ function draw(ctx: CanvasRenderingContext2D, W: number, H: number) {
   // Project all nodes
   rNodes.forEach(n => {
     const p = project3D(n.wx, n.wy, n.wz, rotY, rotX)
-    n.sx = W / 2 + p.sx
-    n.sy = H / 2 + p.sy
+    n.sx = W / 2 + p.sx * zoom
+    n.sy = H / 2 + p.sy * zoom
     n.sz = p.depth
-    n.sr = n.baseR * p.scale
+    n.sr = n.baseR * p.scale * zoom
   })
 
   // ── Edges (sorted back-to-front) ────────────────────────────────────────
@@ -233,13 +235,13 @@ function draw(ctx: CanvasRenderingContext2D, W: number, H: number) {
     const wy = p.from.wy + (p.to.wy - p.from.wy) * p.t
     const wz = p.from.wz + (p.to.wz - p.from.wz) * p.t
     const proj = project3D(wx, wy, wz, rotY, rotX)
-    const pr = Math.max(1.2, 3.5 * proj.scale)
+    const pr = Math.max(1.2, 3.5 * proj.scale * zoom)
 
     ctx.save()
     ctx.shadowColor = p.from.color
     ctx.shadowBlur = 10
     ctx.beginPath()
-    ctx.arc(W / 2 + proj.sx, H / 2 + proj.sy, pr, 0, Math.PI * 2)
+    ctx.arc(W / 2 + proj.sx * zoom, H / 2 + proj.sy * zoom, pr, 0, Math.PI * 2)
     ctx.fillStyle = rgba(p.from.color, proj.scale)
     ctx.fill()
     ctx.restore()
@@ -387,9 +389,16 @@ onMounted(() => {
     canvas.style.cursor = 'grab'
   }
 
+  const onWheel = (e: WheelEvent) => {
+    e.preventDefault()
+    const delta = e.deltaY > 0 ? 0.9 : 1.1
+    zoom = Math.max(0.25, Math.min(4, zoom * delta))
+  }
+
   canvas.addEventListener('mousedown', onDown)
   window.addEventListener('mousemove', onMove)
   window.addEventListener('mouseup', onUp)
+  canvas.addEventListener('wheel', onWheel, { passive: false })
 
   const loop = () => {
     draw(ctx, canvas.width, canvas.height)
@@ -403,6 +412,7 @@ onMounted(() => {
     () => canvas.removeEventListener('mousedown', onDown),
     () => window.removeEventListener('mousemove', onMove),
     () => window.removeEventListener('mouseup', onUp),
+    () => canvas.removeEventListener('wheel', onWheel),
   ]
 })
 
