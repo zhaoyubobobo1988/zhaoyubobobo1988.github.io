@@ -1,33 +1,38 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import TechBackground from '@/components/TechBackground.vue'
 
 const emit = defineEmits<{ (e: 'back'): void }>()
 
-const tabs = ['基本与技能', '教育与实习', '研究项目', '发表论文']
-const activeTab = ref(0)
+const activeSection = ref('about')
 
-const skills = [
-  { title: '后端与框架', tags: ['Python', 'FastAPI', 'RabbitMQ', 'Redis', 'Vue'] },
-  { title: '数据库与存储', tags: ['PostgreSQL', 'MySQL', 'MinIO'] },
-  { title: '部署与运维', tags: ['Docker', 'Docker Compose', 'Linux'] },
-  { title: 'AI / LLM', tags: ['RAG', 'MCP', 'Prompt Engineering', 'Context Engineering', 'LLM应用'] },
+const sections = [
+  { id: 'about',     num: '01', label: '关于我' },
+  { id: 'skills',    num: '02', label: '技能栈' },
+  { id: 'projects',  num: '03', label: '项目经历' },
+  { id: 'education', num: '04', label: '教育背景' },
 ]
 
-const education = [
+const skills = [
   {
-    period: '2019.09 – 2023.07',
-    school: '西安工业大学',
-    major: '软件工程',
-    degree: '学士',
-    note: '',
+    category: 'Backend',
+    color: '#00d4b4',
+    items: ['Python', 'FastAPI', 'RabbitMQ', 'Redis', 'PostgreSQL', 'MySQL', 'MinIO'],
   },
   {
-    period: '2024.09 – 2027.07',
-    school: '大连理工大学',
-    major: '计算机技术',
-    degree: '硕士在读',
-    note: '',
+    category: 'DevOps',
+    color: '#38bdf8',
+    items: ['Docker', 'Docker Compose', 'Linux', 'Nginx'],
+  },
+  {
+    category: 'AI / LLM',
+    color: '#a78bfa',
+    items: ['MCP', 'RAG', 'Prompt Engineering', 'Context Engineering', 'LLM 应用'],
+  },
+  {
+    category: 'Hydrology & ML',
+    color: '#34d399',
+    items: ['Torchhydro', 'LSTM', '时序预测', '洪水预报模型'],
   },
 ]
 
@@ -35,433 +40,619 @@ const projects = [
   {
     name: '实时水文预报服务与智能查询平台',
     period: '2026.01 – 2026.06',
+    filename: 'realtime_forecast.py',
     desc: '面向资料稀缺流域的实时洪水预报平台，集数据同步、模型推理、结果存储与智能查询于一体。通过 MCP 工具接入飞书机器人调用链路，支持自然语言触发预报与历史结果查询，已接入 18 个流域三小时级预报调度。',
+    metrics: [
+      { value: '18', label: '流域覆盖' },
+      { value: '3h', label: '预报粒度' },
+    ],
     tags: ['FastAPI', 'MCP', 'Docker', 'PostgreSQL', 'MinIO', 'Torchhydro'],
-    link: '',
   },
   {
     name: '数据增强系统',
     period: '2025.08 – 2026.04',
-    desc: '面向水文时序模型训练的数据增强平台，支持用户编辑洪水场次时序数据并提交增强任务。基于 RabbitMQ 实现异步任务调度，解耦 FastAPI 与模型计算进程；Redis 管理任务全生命周期状态；PostgreSQL 持久化增强结果，幂等写入策略防止数据污染。',
+    filename: 'data_augment.py',
+    desc: '面向水文时序模型训练的数据增强平台，支持用户编辑洪水场次时序数据并提交增强任务。基于 RabbitMQ 实现异步任务调度（解耦 FastAPI 与模型计算进程），Redis 管理任务全生命周期状态，PostgreSQL 幂等写入策略防止数据污染。',
+    metrics: [
+      { value: '5', label: '任务状态层' },
+      { value: '<1s', label: '状态响应' },
+    ],
     tags: ['FastAPI', 'RabbitMQ', 'Redis', 'PostgreSQL', 'Docker', 'Vue'],
-    link: '',
   },
 ]
 
-interface Paper { year: string; title: string; desc: string; tags: string[]; link: string }
-const papers: Paper[] = []
+const education = [
+  {
+    school: '大连理工大学',
+    degree: '计算机技术 · 硕士在读',
+    period: '2024.09 — 2027.07（预计）',
+    color: '#00d4b4',
+  },
+  {
+    school: '西安工业大学',
+    degree: '软件工程 · 学士',
+    period: '2019.09 — 2023.07',
+    color: '#38bdf8',
+  },
+]
+
+let observer: IntersectionObserver | null = null
+
+onMounted(() => {
+  observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(e => { if (e.isIntersecting) activeSection.value = e.target.id })
+    },
+    { rootMargin: '-35% 0px -60% 0px', threshold: 0 },
+  )
+  sections.forEach(s => {
+    const el = document.getElementById(s.id)
+    if (el) observer!.observe(el)
+  })
+})
+
+onBeforeUnmount(() => { observer?.disconnect() })
+
+function scrollTo(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
 </script>
 
 <template>
   <div class="portfolio">
-    <TechBackground effect="connections" :density="35" :opacity="0.45" :full-screen="true" />
+    <TechBackground effect="connections" :density="28" :opacity="0.28" :full-screen="true" />
 
-    <!-- 左侧 INTRO 导航按钮 -->
-    <button class="nav-arrow prev" @click="emit('back')">
-      <span class="arrow-vert">INTRO</span>
-      <span class="arrow-icon">‹</span>
-    </button>
+    <div class="layout">
 
-    <!-- 主内容卡片 -->
-    <div class="card-wrap">
-      <div class="card">
-        <!-- 头像 -->
-        <div class="avatar">赵</div>
+      <!-- ══ SIDEBAR ══ -->
+      <aside class="sidebar">
+        <div class="sb-top">
+          <div class="avatar">赵</div>
+          <h1 class="name">赵宇博</h1>
+          <p class="role">后端开发 · AI 应用工程师</p>
+          <p class="school">@ 大连理工大学</p>
+        </div>
 
-        <!-- 姓名 & 标语 -->
-        <h1 class="name">赵宇博</h1>
-        <p class="tagline">大连理工大学 · 计算机技术硕士在读 · 后端开发 & AI 应用</p>
-
-        <!-- Tab 导航 -->
-        <nav class="tabs">
+        <nav class="side-nav">
           <button
-            v-for="(tab, i) in tabs"
-            :key="tab"
-            class="tab-btn"
-            :class="{ active: activeTab === i }"
-            @click="activeTab = i"
+            v-for="s in sections"
+            :key="s.id"
+            class="nav-item"
+            :class="{ active: activeSection === s.id }"
+            @click="scrollTo(s.id)"
           >
-            <span class="tab-dot" />
-            {{ tab }}
+            <span class="nav-num">{{ s.num }}.</span>
+            <span class="nav-label">{{ s.label }}</span>
+            <span class="nav-bar" />
           </button>
         </nav>
 
-        <!-- Tab 内容面板 -->
-        <div class="panel">
-
-          <!-- ── 基本与技能 ── -->
-          <div v-if="activeTab === 0" class="panel-inner">
-            <p class="bio">
-              本科毕业于西安工业大学软件工程专业，目前在大连理工大学攻读计算机技术硕士学位。专注 Python 后端服务开发与 AI 应用落地，在水文智能预报领域积累了完整的工程实践经验，具备从接口设计、异步任务编排到容器化部署的全链路开发能力。
-            </p>
-            <p class="bio">
-              熟悉 LLM 应用开发基础，了解 RAG、MCP、Prompt Engineering、Context Engineering 等技术；具备 FastAPI 接口设计、RabbitMQ 异步调度、Redis 状态管理和 PostgreSQL 数据建模经验，日常使用 Cursor、Claude Code 等 AI 编程工具辅助开发。
-            </p>
-            <div class="skill-grid">
-              <div v-for="group in skills" :key="group.title" class="skill-group">
-                <div class="sg-title">{{ group.title }}</div>
-                <div class="sg-tags">
-                  <span v-for="tag in group.tags" :key="tag" class="tag">{{ tag }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ── 教育与实习 ── -->
-          <div v-if="activeTab === 1" class="panel-inner">
-            <div class="timeline">
-              <div v-for="item in education" :key="item.period" class="tl-item">
-                <div class="tl-period">{{ item.period }}</div>
-                <div class="tl-dot" />
-                <div class="tl-content">
-                  <div class="tl-school">{{ item.school }}</div>
-                  <div class="tl-meta">{{ item.major }} · <span class="badge">{{ item.degree }}</span></div>
-                  <div v-if="item.note" class="tl-note">{{ item.note }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ── 研究项目 ── -->
-          <div v-if="activeTab === 2" class="panel-inner">
-            <div class="projects">
-              <div v-for="proj in projects" :key="proj.name" class="proj-card">
-                <div class="proj-icon">◈</div>
-                <div class="proj-body">
-                  <div class="proj-header">
-                    <div class="proj-name">{{ proj.name }}</div>
-                    <div class="proj-period">{{ proj.period }}</div>
-                  </div>
-                  <div class="proj-desc">{{ proj.desc }}</div>
-                  <div class="proj-tags">
-                    <span v-for="t in proj.tags" :key="t" class="tag">{{ t }}</span>
-                    <a v-if="proj.link" :href="proj.link" target="_blank" class="tag link-tag">项目链接 ↗</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ── 发表论文 ── -->
-          <div v-if="activeTab === 3" class="panel-inner">
-            <div class="paper-section-title">期刊论文</div>
-            <div v-if="papers.length === 0" class="empty-state">
-              <div class="empty-icon">◻</div>
-              <div class="empty-text">暂无已发表论文，持续产出中…</div>
-            </div>
-            <div v-else class="papers">
-              <div v-for="paper in papers" :key="paper.title" class="paper-item">
-                <div class="paper-year">{{ paper.year }}</div>
-                <div class="paper-body">
-                  <div class="paper-icon">◻</div>
-                  <div>
-                    <div class="paper-title">{{ paper.title }}</div>
-                    <div class="paper-desc">{{ paper.desc }}</div>
-                    <div class="paper-tags">
-                      <span v-for="t in paper.tags" :key="t" class="tag">{{ t }}</span>
-                      <a v-if="paper.link" :href="paper.link" target="_blank" class="tag link-tag">论文链接 ↗</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
+        <div class="sb-bottom">
+          <a class="cl" href="mailto:2360828996@qq.com">
+            <span>✉</span> 2360828996@qq.com
+          </a>
+          <a class="cl" href="/赵宇博.pdf" download="赵宇博_简历.pdf">
+            <span>↓</span> 下载简历 PDF
+          </a>
+          <button class="back-btn" @click="emit('back')">‹ INTRO</button>
         </div>
-      </div>
-    </div>
+      </aside>
 
-    <!-- 底部按钮 -->
-    <div class="bottom-actions">
-      <button class="btn-primary">下载简历 PDF</button>
-      <button class="btn-ghost">了解我更多 →</button>
+      <!-- ══ MAIN CONTENT ══ -->
+      <main class="content">
+
+        <!-- 01 关于我 -->
+        <section id="about" class="sec">
+          <div class="sec-hd">
+            <span class="sec-num">01.</span>
+            <h2 class="sec-title">关于我</h2>
+            <div class="sec-rule" />
+          </div>
+          <p class="bio">
+            本科毕业于西安工业大学软件工程专业，目前在大连理工大学攻读计算机技术硕士学位。
+            专注 Python 后端服务开发与 AI 应用落地，在水文智能预报领域积累了完整的工程实践经验，
+            具备从接口设计、异步任务编排到容器化部署的全链路开发能力。
+          </p>
+          <p class="bio">
+            熟悉 LLM 应用开发基础，了解 RAG、MCP、Prompt Engineering、Context Engineering 等技术；
+            日常使用 Cursor、Claude Code 等 AI 编程工具辅助开发，持续探索 AI 与工程实践的结合边界。
+          </p>
+          <div class="stats">
+            <div class="stat">
+              <span class="stat-val">18</span>
+              <span class="stat-lbl">流域覆盖</span>
+            </div>
+            <div class="stat">
+              <span class="stat-val">2</span>
+              <span class="stat-lbl">在研项目</span>
+            </div>
+            <div class="stat">
+              <span class="stat-val">3h</span>
+              <span class="stat-lbl">预报粒度</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 02 技能栈 -->
+        <section id="skills" class="sec">
+          <div class="sec-hd">
+            <span class="sec-num">02.</span>
+            <h2 class="sec-title">技能栈</h2>
+            <div class="sec-rule" />
+          </div>
+          <div class="skill-groups">
+            <div v-for="g in skills" :key="g.category" class="sg">
+              <div class="sg-cat" :style="{ color: g.color }">{{ g.category }}</div>
+              <div class="sg-tags">
+                <span
+                  v-for="item in g.items"
+                  :key="item"
+                  class="stag"
+                  :style="{ '--c': g.color }"
+                >{{ item }}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 03 项目经历 -->
+        <section id="projects" class="sec">
+          <div class="sec-hd">
+            <span class="sec-num">03.</span>
+            <h2 class="sec-title">项目经历</h2>
+            <div class="sec-rule" />
+          </div>
+          <div class="projects">
+            <div v-for="proj in projects" :key="proj.name" class="tcard">
+              <div class="tcard-hd">
+                <div class="dots">
+                  <i class="dot dr" /><i class="dot dy" /><i class="dot dg" />
+                </div>
+                <span class="tfn">{{ proj.filename }}</span>
+                <span class="tperiod">{{ proj.period }}</span>
+              </div>
+              <div class="tcard-bd">
+                <div class="ptitle">{{ proj.name }}</div>
+                <p class="pdesc">{{ proj.desc }}</p>
+                <div class="pmetrics">
+                  <div v-for="m in proj.metrics" :key="m.label" class="pm">
+                    <span class="pmv">{{ m.value }}</span>
+                    <span class="pml">{{ m.label }}</span>
+                  </div>
+                </div>
+                <div class="ptags">
+                  <span v-for="t in proj.tags" :key="t" class="ptag">{{ t }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 04 教育背景 -->
+        <section id="education" class="sec">
+          <div class="sec-hd">
+            <span class="sec-num">04.</span>
+            <h2 class="sec-title">教育背景</h2>
+            <div class="sec-rule" />
+          </div>
+          <div class="edu-list">
+            <div v-for="e in education" :key="e.school" class="edu" :style="{ '--ec': e.color }">
+              <div class="edu-dot" />
+              <div class="edu-body">
+                <div class="edu-school">{{ e.school }}</div>
+                <div class="edu-degree">{{ e.degree }}</div>
+                <div class="edu-period">{{ e.period }}</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
     </div>
   </div>
 </template>
 
 <style scoped>
+/* ── Base ── */
 .portfolio {
   position: relative;
   width: 100vw;
   height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
 }
 
-/* ── 导航箭头 ── */
-.nav-arrow {
-  position: fixed;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 30;
-  width: 52px;
-  height: 120px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--border-default);
-  color: rgba(255,255,255,0.3);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(8px);
-}
-.nav-arrow:hover { color: #fff; border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.07); }
-.nav-arrow.prev { left: 20px; }
-.arrow-vert { font-size: 11px; letter-spacing: 3px; writing-mode: vertical-rl; opacity: 0.6; }
-.arrow-icon { font-size: 28px; line-height: 1; }
-
-/* ── 主卡片 ── */
-.card-wrap {
+.layout {
   position: relative;
   z-index: 10;
-  width: min(780px, calc(100vw - 160px));
-  max-height: calc(100vh - 120px);
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(0,212,180,0.2) transparent;
+  display: flex;
+  width: 100%;
+  height: 100%;
 }
 
-.card {
-  background: rgba(5, 20, 45, 0.75);
-  border: 1px solid var(--border-default);
-  border-radius: 24px;
-  padding: 40px 48px 32px;
-  backdrop-filter: blur(20px);
+/* ── Sidebar ── */
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  padding: 52px 32px 36px;
+  border-right: 1px solid rgba(0, 212, 180, 0.08);
+  background: rgba(5, 13, 26, 0.88);
+  backdrop-filter: blur(16px);
 }
 
-/* ── 头像 ── */
+.sb-top { margin-bottom: 44px; }
+
 .avatar {
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
+  width: 68px;
+  height: 68px;
+  border-radius: 12px;
   background: linear-gradient(135deg, #00d4b4 0%, #0891b2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40px;
+  font-size: 28px;
   font-weight: 700;
-  color: #0a1628;
-  margin-bottom: 20px;
-  box-shadow: 0 0 40px rgba(0,212,180,0.3);
+  color: #050d1a;
+  margin-bottom: 18px;
+  box-shadow: 0 0 28px rgba(0, 212, 180, 0.22);
 }
 
-/* ── 姓名 & 标语 ── */
 .name {
-  font-size: 36px;
+  font-size: 20px;
   font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: 4px;
-  margin-bottom: 10px;
-}
-.tagline {
-  font-size: 15px;
-  color: var(--text-secondary);
-  letter-spacing: 4px;
-  margin-bottom: 28px;
+  color: #ccd6f6;
+  letter-spacing: 3px;
+  margin-bottom: 6px;
 }
 
-/* ── Tabs ── */
-.tabs {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.tab-btn {
-  padding: 9px 22px;
-  border-radius: 8px;
-  border: 1px solid var(--border-default);
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 14px;
+.role {
+  font-size: 12px;
+  color: #00d4b4;
   letter-spacing: 1px;
-  cursor: pointer;
-  transition: all 0.25s ease;
+  margin-bottom: 3px;
+}
+
+.school {
+  font-size: 11px;
+  color: #8892b0;
+  letter-spacing: 0.5px;
+}
+
+/* ── Nav ── */
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.nav-item {
   display: flex;
   align-items: center;
-  gap: 7px;
-}
-.tab-btn:hover { color: var(--text-primary); border-color: rgba(255,255,255,0.25); }
-.tab-btn.active {
-  border-color: var(--accent-primary);
-  color: var(--accent-primary);
-  background: rgba(0,212,180,0.08);
-}
-.tab-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.6;
+  gap: 10px;
+  padding: 11px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #8892b0;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-align: left;
+  transition: color 0.2s;
 }
 
-/* ── Panel ── */
-.panel {
-  width: 100%;
-  min-height: 220px;
+.nav-item:hover { color: #ccd6f6; }
+.nav-item.active { color: #00d4b4; }
+
+.nav-num {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 10px;
+  min-width: 22px;
+  opacity: 0.55;
 }
-.panel-inner {
-  animation: fadeUp 0.3s ease;
+.nav-item.active .nav-num { opacity: 1; }
+
+.nav-label { flex: 1; }
+
+.nav-bar {
+  height: 1px;
+  width: 0;
+  background: currentColor;
+  opacity: 0;
+  transition: width 0.35s ease, opacity 0.2s;
 }
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+.nav-item.active .nav-bar { width: 36px; opacity: 0.5; }
+.nav-item:hover .nav-bar  { width: 20px; opacity: 0.25; }
+
+/* ── Sidebar bottom ── */
+.sb-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 20px;
+}
+
+.cl {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #8892b0;
+  text-decoration: none;
+  transition: color 0.2s;
+  letter-spacing: 0.3px;
+}
+.cl:hover { color: #00d4b4; }
+
+.back-btn {
+  margin-top: 6px;
+  padding: 7px 0;
+  background: none;
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  color: #8892b0;
+  font-size: 10px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  transition: color 0.2s;
+  text-align: left;
+}
+.back-btn:hover { color: #ccd6f6; }
+
+/* ── Content ── */
+.content {
+  flex: 1;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 80px 72px 120px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 212, 180, 0.15) transparent;
+}
+
+/* ── Section ── */
+.sec {
+  margin-bottom: 96px;
+  scroll-margin-top: 80px;
+}
+
+.sec-hd {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 36px;
+}
+
+.sec-num {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  color: #00d4b4;
+  font-size: 13px;
+}
+
+.sec-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #ccd6f6;
+  letter-spacing: 3px;
+  white-space: nowrap;
+}
+
+.sec-rule {
+  flex: 1;
+  height: 1px;
+  background: rgba(0, 212, 180, 0.1);
+  max-width: 200px;
 }
 
 /* ── Bio ── */
 .bio {
   font-size: 14px;
-  line-height: 1.9;
-  color: var(--text-secondary);
-  margin-bottom: 14px;
-}
-
-/* ── Skill grid ── */
-.skill-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 8px;
-}
-.skill-group {
-  background: var(--bg-card);
-  border: 1px solid var(--border-default);
-  border-radius: 12px;
-  padding: 14px 16px;
-}
-.sg-title {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-bottom: 10px;
-  letter-spacing: 1px;
-}
-.sg-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-
-/* ── Tags ── */
-.tag {
-  padding: 3px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  border: 1px solid rgba(0,212,180,0.25);
-  color: rgba(0,212,180,0.8);
-  background: rgba(0,212,180,0.05);
-  font-family: 'JetBrains Mono', 'Consolas', monospace;
-}
-.link-tag { color: var(--accent-info); border-color: rgba(56,189,248,0.3); cursor: pointer; }
-.link-tag:hover { background: rgba(56,189,248,0.1); }
-
-/* ── Timeline ── */
-.timeline { display: flex; flex-direction: column; gap: 24px; padding: 4px 0; }
-.tl-item { display: grid; grid-template-columns: 100px 20px 1fr; gap: 0 16px; align-items: start; }
-.tl-period { font-size: 12px; color: var(--text-secondary); text-align: right; padding-top: 3px; }
-.tl-dot {
-  width: 10px; height: 10px; border-radius: 50%;
-  background: var(--accent-primary);
-  box-shadow: 0 0 8px var(--accent-primary);
-  margin-top: 5px;
-  justify-self: center;
-}
-.tl-school { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 4px; }
-.tl-meta { font-size: 13px; color: var(--text-secondary); }
-.tl-note { font-size: 12px; color: var(--text-secondary); margin-top: 4px; opacity: 0.7; }
-.badge {
-  display: inline-block;
-  padding: 1px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  border: 1px solid rgba(0,212,180,0.3);
-  color: var(--accent-primary);
-}
-
-/* ── Projects ── */
-.projects { display: flex; flex-direction: column; gap: 16px; }
-.proj-card {
-  display: flex;
-  gap: 16px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-default);
-  border-radius: 12px;
-  padding: 18px 20px;
-  transition: border-color 0.25s;
-}
-.proj-card:hover { border-color: rgba(0,212,180,0.3); }
-.proj-icon { font-size: 20px; color: var(--accent-primary); flex-shrink: 0; padding-top: 2px; }
-.proj-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; gap: 12px; }
-.proj-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
-.proj-period { font-size: 12px; color: var(--text-secondary); white-space: nowrap; opacity: 0.7; }
-.proj-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 10px; }
-.proj-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-
-/* ── Papers ── */
-.paper-section-title {
-  font-size: 14px;
-  color: var(--accent-primary);
-  border-bottom: 1px solid rgba(0,212,180,0.2);
-  padding-bottom: 8px;
+  line-height: 1.95;
+  color: #8892b0;
+  max-width: 560px;
   margin-bottom: 16px;
-  letter-spacing: 2px;
 }
-.papers { display: flex; flex-direction: column; gap: 20px; }
-.paper-item { display: grid; grid-template-columns: 72px 1fr; gap: 16px; align-items: start; }
-.paper-year { font-size: 12px; color: var(--text-secondary); padding-top: 3px; }
-.paper-body { display: flex; gap: 12px; }
-.paper-icon { font-size: 16px; color: var(--text-secondary); flex-shrink: 0; padding-top: 1px; }
-.paper-title { font-size: 14px; font-weight: 600; font-style: italic; color: var(--text-primary); margin-bottom: 6px; line-height: 1.5; }
-.paper-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 8px; }
-.paper-tags { display: flex; flex-wrap: wrap; gap: 6px; }
 
-/* ── Empty state ── */
-.empty-state {
+/* ── Stats ── */
+.stats {
+  display: flex;
+  gap: 44px;
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.stat { display: flex; flex-direction: column; gap: 5px; }
+
+.stat-val {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 40px;
+  font-weight: 700;
+  color: #00d4b4;
+  line-height: 1;
+}
+
+.stat-lbl {
+  font-size: 11px;
+  color: #8892b0;
+  letter-spacing: 1.5px;
+}
+
+/* ── Skills ── */
+.skill-groups {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 48px 0;
-  opacity: 0.45;
+  gap: 20px;
 }
-.empty-icon { font-size: 32px; color: var(--text-secondary); }
-.empty-text { font-size: 14px; color: var(--text-secondary); letter-spacing: 2px; }
 
-/* ── Bottom actions ── */
-.bottom-actions {
-  position: relative;
-  z-index: 10;
+.sg-cat {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.sg-tags {
   display: flex;
-  gap: 16px;
-  margin-top: 20px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
-.btn-primary {
-  padding: 12px 36px;
+
+.stag {
+  padding: 4px 12px;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 12px;
+  border: 1px solid var(--c, #00d4b4);
+  color: var(--c, #00d4b4);
+  opacity: 0.65;
+  transition: all 0.2s ease;
+  cursor: default;
+}
+
+.stag:hover {
+  opacity: 1;
+  background: color-mix(in srgb, var(--c, #00d4b4) 7%, transparent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--c, #00d4b4) 18%, transparent);
+}
+
+/* ── Terminal cards ── */
+.projects {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.tcard {
+  border: 1px solid rgba(0, 212, 180, 0.12);
   border-radius: 10px;
-  background: var(--accent-primary);
-  color: #050d1a;
-  font-size: 14px;
+  overflow: hidden;
+  transition: border-color 0.25s, transform 0.25s;
+}
+.tcard:hover {
+  border-color: rgba(0, 212, 180, 0.32);
+  transform: translateY(-2px);
+}
+
+.tcard-hd {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: rgba(0, 212, 180, 0.03);
+  border-bottom: 1px solid rgba(0, 212, 180, 0.08);
+}
+
+.dots { display: flex; gap: 5px; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+.dr { background: #ef4444; opacity: 0.8; }
+.dy { background: #f59e0b; opacity: 0.8; }
+.dg { background: #22c55e; opacity: 0.8; }
+
+.tfn {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 12px;
+  color: #8892b0;
+  flex: 1;
+}
+
+.tperiod {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 11px;
+  color: rgba(0, 212, 180, 0.45);
+}
+
+.tcard-bd { padding: 22px 24px; }
+
+.ptitle {
+  font-size: 15px;
   font-weight: 600;
-  letter-spacing: 2px;
-  cursor: pointer;
-  transition: all 0.25s;
+  color: #ccd6f6;
+  margin-bottom: 10px;
 }
-.btn-primary:hover { box-shadow: 0 0 24px rgba(0,212,180,0.5); }
-.btn-ghost {
-  padding: 12px 36px;
-  border-radius: 10px;
-  border: 1px solid var(--border-default);
-  color: var(--text-secondary);
-  font-size: 14px;
-  letter-spacing: 2px;
-  cursor: pointer;
-  transition: all 0.25s;
+
+.pdesc {
+  font-size: 13px;
+  color: #8892b0;
+  line-height: 1.8;
+  margin-bottom: 18px;
 }
-.btn-ghost:hover { border-color: rgba(255,255,255,0.3); color: var(--text-primary); }
+
+.pmetrics { display: flex; gap: 32px; margin-bottom: 18px; }
+
+.pm { display: flex; flex-direction: column; gap: 3px; }
+
+.pmv {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: #00d4b4;
+  line-height: 1;
+}
+
+.pml { font-size: 11px; color: #8892b0; letter-spacing: 0.5px; }
+
+.ptags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.ptag {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  padding: 2px 10px;
+  border-radius: 3px;
+  font-size: 11px;
+  border: 1px solid rgba(0, 212, 180, 0.18);
+  color: rgba(0, 212, 180, 0.6);
+}
+
+/* ── Education ── */
+.edu-list {
+  display: flex;
+  flex-direction: column;
+  padding-left: 8px;
+}
+
+.edu {
+  position: relative;
+  display: flex;
+  gap: 20px;
+  padding: 0 0 36px 28px;
+  border-left: 1.5px solid var(--ec, #00d4b4);
+}
+.edu:last-child { border-left-color: transparent; padding-bottom: 0; }
+
+.edu-dot {
+  position: absolute;
+  left: -5px;
+  top: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ec, #00d4b4);
+  box-shadow: 0 0 10px var(--ec, #00d4b4);
+  flex-shrink: 0;
+}
+
+.edu-body {}
+
+.edu-school {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ccd6f6;
+  margin-bottom: 5px;
+}
+
+.edu-degree {
+  font-size: 13px;
+  color: #8892b0;
+  margin-bottom: 6px;
+}
+
+.edu-period {
+  font-family: 'JetBrains Mono', 'Consolas', monospace;
+  font-size: 11px;
+  color: var(--ec, #00d4b4);
+  opacity: 0.65;
+}
 </style>
