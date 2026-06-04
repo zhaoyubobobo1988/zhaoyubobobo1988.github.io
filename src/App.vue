@@ -1,7 +1,22 @@
 <script setup lang="ts">
-import Portfolio from '@/components/Portfolio.vue'
+import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <Portfolio />
+  <RouterView v-slot="{ Component }">
+    <Transition name="page" mode="out-in">
+      <component :is="Component" />
+    </Transition>
+  </RouterView>
 </template>
+
+<style>
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.35s ease;
+}
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
+</style>

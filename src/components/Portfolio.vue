@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const activeSection = ref('about')
 
@@ -129,6 +132,9 @@ function scrollTo(id: string) {
           </a>
           <a class="cl" href="/赵宇博.pdf" download="赵宇博_简历.pdf">
             <span>↓</span> 下载简历 PDF
+          </a>
+          <a class="cl home-link" href="#" @click.prevent="router.push('/')">
+            <span>⬡</span> 神经网络主页
           </a>
         </div>
       </aside>
