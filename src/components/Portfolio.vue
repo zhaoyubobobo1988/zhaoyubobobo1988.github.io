@@ -2,7 +2,6 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import TechBackground from '@/components/TechBackground.vue'
 
-const emit = defineEmits<{ (e: 'back'): void }>()
 
 const activeSection = ref('about')
 
@@ -134,7 +133,6 @@ function scrollTo(id: string) {
           <a class="cl" href="/赵宇博.pdf" download="赵宇博_简历.pdf">
             <span>↓</span> 下载简历 PDF
           </a>
-          <button class="back-btn" @click="emit('back')">‹ INTRO</button>
         </div>
       </aside>
 
